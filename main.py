@@ -6,7 +6,7 @@ from io import BytesIO
 from tensorflow import keras
 import numpy as np
 from PIL import Image
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import cv2
 
 myModel = keras.models.load_model('model.h5')
@@ -20,7 +20,14 @@ def read_file_as_image(data) -> np.ndarray:
     image = np.array(Image.open(BytesIO(data)))
     return image
 
-@app.route("/pred", methods=["GET", "POST"])
+@app.route("/", methods=["GET"])
+def index():
+    res = "hello from server"
+    return jsonify({
+        'msg' : res
+    })
+
+@app.route("/predict", methods=["POST"])
 def predict():
     file = request.files.get('file')
     image = read_file_as_image(file.read())
@@ -37,5 +44,4 @@ def predict():
     }
 
 if __name__ == "__main__":
-    app.run(debug=True)
-
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
