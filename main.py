@@ -15,10 +15,10 @@ from google.cloud import firestore
 from firebase_admin import credentials, firestore, initialize_app
 from google.cloud import storage
 
-cred = {'projectId': 'capstone-project-387201'}
-app = firebase_admin.initialize_app(options=cred)
-# cred = credentials.Certificate("credentials.json")
-# firebase_admin.initialize_app(cred)
+#cred = {'projectId': 'capstone-project-387201'}
+#app = firebase_admin.initialize_app(options=cred)
+cred = credentials.Certificate("credentials.json")
+firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 myModel = keras.models.load_model('model.h5')
