@@ -15,9 +15,10 @@ from google.cloud import firestore
 from firebase_admin import credentials, firestore, initialize_app
 from google.cloud import storage
 
-
-cred = credentials.Certificate("credentials.json")
-firebase_admin.initialize_app(cred)
+cred = {'projectId': 'capstone-project-387201'}
+app = firebase_admin.initialize_app(options=cred)
+# cred = credentials.Certificate("credentials.json")
+# firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 myModel = keras.models.load_model('model.h5')
@@ -96,62 +97,11 @@ def index():
             font-size: 32px;
             margin-bottom: 20px;
         }
-
-        .nav {
-            margin-bottom: 40px;
-            text-align: center;
-        }
-
-        .nav a {
-            margin-right: 20px;
-            text-decoration: none;
-            color: #333;
-            font-size: 20px;
-        }
-
-        .form-container {
-            text-align: center;
-        }
-
-        .form-container input[type="file"] {
-            margin-bottom: 20px;
-            display: block;
-            width: 100%;
-            padding: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 18px;
-        }
-
-        .form-container button {
-            padding: 15px 30px;
-            background-color: #A0D8B3;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 18px;
-            transition: background-color 0.3s ease;
-        }
-
-        .form-container button:hover {
-            background-color: #47A992;
-        }
     </style>
     </head>
     <body>
         <div class="container">
             <h1>Welcome to CureCorn Web Server App!</h1>
-            <div class="nav">
-                <a href="/docs">API Documentation</a>
-            </div>
-            <div class="form-container">
-                <form action="/predict" method="post" enctype="multipart/form-data">
-                    <input type="file" name="file" accept=".jpg,.jpeg,.png">
-                    <br>
-                    <button type="submit">Upload and Predict</button>
-                </form>
-            </div>
         </div>
     </body>
     </html>
