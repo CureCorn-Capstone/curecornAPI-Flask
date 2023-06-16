@@ -15,8 +15,8 @@ from google.cloud import firestore
 from firebase_admin import credentials, firestore, initialize_app
 from google.cloud import storage
 
-#cred = {'projectId': 'capstone-project-387201'}
-#app = firebase_admin.initialize_app(options=cred)
+# cred = {'projectId': 'capstone-project-387201'}
+# app = firebase_admin.initialize_app(options=cred)
 cred = credentials.Certificate("credentials.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
@@ -33,35 +33,35 @@ def read_file_as_image(data) -> np.ndarray:
     return image
 
 def upload_image_to_storage(file):
-    # Inisialisasi klien penyimpanan Firebase
+    # Initializing the Firebase storage client.
     bucket_name = "capstone-project-387201.appspot.com"
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
     
-    # Buat nama unik untuk file gambar
+    # Generate a unique name for the image file.
     filename = file.filename
     
-    # Upload file gambar ke Firebase Storage
+    # Upload the image file to Firebase Storage.
     blob = bucket.blob(filename)
     blob.upload_from_string(file.read(), content_type=file.content_type)
     
-    # Dapatkan URL akses ke file gambar
+    # Get the access URL for the image file.
     image_url = blob.public_url
     
     return image_url
 
-# Fungsi untuk menyimpan hasil prediksi ke Cloud Firestore
-def simpan_hasil_prediksi(data, file):
+# Function to save the prediction results to Cloud Firestore
+def prediction_result(data, file):
     # Mendapatkan referensi koleksi "history"
     collection_ref = db.collection('history')
 
-    # Membuat dokumen baru dengan ID yang dihasilkan secara otomatis
+    # Create a new document with automatically generated ID
     doc_ref = collection_ref.document()
 
-    # Mengunggah file gambar ke Firebase Storage
+    # Upload image file to Firebase Storage
     image_url = upload_image_to_storage(file)
     
-    # Menyimpan data hasil prediksi ke dalam dokumen
+    # Save prediction data to the document
     doc_ref.set({
         'class': data['class'],
         'confidence': data['confidence'],
@@ -69,7 +69,7 @@ def simpan_hasil_prediksi(data, file):
         'timestamp': firestore.SERVER_TIMESTAMP
     })
 
-    print("Hasil prediksi berhasil disimpan ke Cloud Firestore.")
+    print("The prediction results have been successfully stored in Cloud Firestore.")
 
 @app.route("/", methods=["GET"])
 def index():
@@ -120,15 +120,15 @@ def predict():
     predicted_class = label[np.argmax(predictions[0])]
     confidence = np.max(predictions[0])
 
-    # Menyusun data hasil prediksi untuk disimpan ke Cloud Firestore
+    # Organizing the prediction results data to be stored in Cloud Firestore.
     data = {
         'class': predicted_class,
         'confidence': float(confidence),
         'image': file.filename,
     }
 
-    # Menyimpan hasil prediksi ke Cloud Firestore
-    simpan_hasil_prediksi(data, file)
+    # Saving the prediction results to Cloud Firestore.
+    prediction_result(data, file)
     
     return {
         'class': predicted_class,
