@@ -1,23 +1,36 @@
 # import library
 import os
-import uuid 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 from io import BytesIO
 from tensorflow import keras
 import numpy as np
 from PIL import Image
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, json
 import cv2
 import base64
 import firebase_admin
-from google.cloud import firestore
+from google.cloud import firestore, storage
 from firebase_admin import credentials, firestore, initialize_app
-from google.cloud import storage
 
-# cred = {'projectId': 'capstone-project-387201'}
-# app = firebase_admin.initialize_app(options=cred)
-cred = credentials.Certificate("credentials.json")
+
+# Initializing the Google Cloud Storage Client
+storage_client = storage.Client()
+
+def get_credentials():
+    bucket_name = 'firebase_credentials'
+    blob_name = 'credentials.json'
+
+    # Retrieve a blob object from Cloud Storage
+    bucket = storage_client.get_bucket(bucket_name)
+    blob = bucket.blob(blob_name)
+
+    # Read the file content as a string
+    credentials_data = blob.download_as_text()
+
+    return credentials_data
+
+cred = credentials.Certificate(json.loads(get_credentials()))
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
